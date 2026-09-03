@@ -1,0 +1,295 @@
+.navbar {
+  height: 52px;
+  background: #0d0d0d;
+  border-bottom: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo {
+  font-size: 17px;
+  font-weight: 700;
+  color: #ff6b00;
+}
+
+.divider {
+  color: #444;
+  font-size: 16px;
+}
+
+.project-name-input {
+  background: transparent;
+  border: none;
+  color: #999;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  width: 120px;
+  outline: none;
+}
+
+.project-name-input:focus {
+  color: #e0e0e0;
+  border-bottom: 1px solid #ff6b00;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #333;
+  color: #aaa;
+}
+
+.btn-outline:hover {
+  border-color: #555;
+  color: #e0e0e0;
+}
+
+.btn-orange {
+  background: #ff6b00;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-orange:hover {
+  background: #e05e00;
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.left-panel {
+  width: 35%;
+  background: #111;
+  border-right: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+}
+
+.model-bar {
+  padding: 12px 16px;
+  border-bottom: 1px solid #222;
+  flex-shrink: 0;
+}
+
+.model-select {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  color: #e0e0e0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+.model-select:focus {
+  outline: none;
+  border-color: #ff6b00;
+}
+
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-area::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-area::-webkit-scrollbar-thumb {
+  background: #2e2e2e;
+  border-radius: 4px;
+}
+
+.msg {
+  max-width: 85%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.msg-user {
+  align-self: flex-end;
+  background: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #2e2e2e;
+}
+
+.msg-ai {
+  align-self: flex-start;
+  background: #1a1100;
+  color: #ffaa55;
+  border: 1px solid #3a2200;
+}
+
+.input-bar {
+  padding: 12px 16px;
+  border-top: 1px solid #222;
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+}
+
+.prompt-input {
+  flex: 1;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  color: #e0e0e0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  resize: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.prompt-input:focus {
+  outline: none;
+  border-color: #ff6b00;
+}
+
+.send-btn {
+  padding: 10px 16px;
+  background: #ff6b00;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+.send-btn:hover {
+  background: #e05e00;
+}
+
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d0d;
+}
+
+.preview-toolbar {
+  height: 48px;
+  background: #111;
+  border-bottom: 1px solid #222;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.view-btn {
+  padding: 5px 12px;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  color: #aaa;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+.view-btn.active {
+  background: #ff6b00;
+  color: #fff;
+  border-color: #ff6b00;
+  font-weight: 600;
+}
+
+.view-btn:not(.active):hover {
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.toolbar-btn {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid #2e2e2e;
+  color: #aaa;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+.toolbar-btn:hover {
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+.preview-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d0d0d;
+  overflow: hidden;
+}
+
+.frame-wrap {
+  height: 100%;
+  max-width: 100%;
+  transition: width 0.3s ease;
+}
+
+.preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+.empty-state {
+  text-align: center;
+  color: #333;
+}
+
+.empty-state h2 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+.empty-state p {
+  font-size: 13px;
+  color: #333;
+}
