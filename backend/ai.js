@@ -1,7 +1,5 @@
 import 'dotenv/config'
-
 const SYSTEM = `You are a landing page generator. Return ONLY a single complete HTML file with all CSS and JS embedded inside <style> and <script> tags. The page must be animated, responsive, and visually stunning. Output raw HTML only — no markdown, no explanation, no code fences.`
-
 async function openaiCall(url, key, model, messages) {
   const res = await fetch(url, {
     method: 'POST',
