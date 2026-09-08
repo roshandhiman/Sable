@@ -12,10 +12,9 @@
     -webkit-backdrop-filter: blur(16px);
     margin-bottom: 5%;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.15);
     /* background-color: grey; */
     /*for the animation around */
-    border: 1px solid transparent;
     background-clip: padding-box;
 }
 
@@ -39,35 +38,35 @@
     animation: rotateBorder 3s linear infinite;
     pointer-events: none;
 } */
-
-/* .prompt-box::before {
+.prompt-box::before {
     content: "";
     position: absolute;
-    inset: -1px;
+    inset: -2px;
     border-radius: 40px;
-    padding: 1px;
+    padding: 2px;
     background: linear-gradient(90deg,
-            rgba(255, 0, 128, 0.8),
+            transparent,
+            rgba(255, 255, 255, 0.8),
+            rgba(120, 80, 255, 0.9),
             rgba(0, 200, 255, 0.8),
-            rgba(120, 0, 255, 0.8),
-            rgba(255, 0, 128, 0.8));
-    background-size: 300% 300%;
-    animation: rotateBorder 5s linear infinite;
+            transparent);
+    background-size: 300% 100%;
+    animation: borderFlow 3s linear infinite;
     -webkit-mask:
         linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-} */
+}
 
-@keyframes rotateBorder {
+@keyframes borderFlow {
     from {
-        transform: rotate(0deg);
+        background-position: 0% 50%;
     }
 
     to {
-        transform: rotate(360deg);
+        background-position: 300% 50%;
     }
 }
 
