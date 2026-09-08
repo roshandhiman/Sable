@@ -1,0 +1,79 @@
+.prompt-box {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 18px;
+    /* background: transparent; */
+    background: rgba(255, 255, 255, 0.04);
+    /* border: 1px solid rgba(255, 255, 255, 0.15); */
+    border-radius: 40px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    margin-bottom: 5%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    /* background-color: grey; */
+    /*for the animation around */
+    border: 1px solid transparent;
+    background-clip: padding-box;
+}
+
+/* .prompt-box::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: 40px;
+    padding: 1px;
+    background: conic-gradient(from 0deg,
+            transparent 0%,
+            transparent 85%,
+            rgba(139, 92, 246, 1) 92%,
+            rgba(59, 130, 246, 1) 96%,
+            transparent 100%);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: rotateBorder 3s linear infinite;
+    pointer-events: none;
+} */
+
+/* .prompt-box::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: 40px;
+    padding: 1px;
+    background: linear-gradient(90deg,
+            rgba(255, 0, 128, 0.8),
+            rgba(0, 200, 255, 0.8),
+            rgba(120, 0, 255, 0.8),
+            rgba(255, 0, 128, 0.8));
+    background-size: 300% 300%;
+    animation: rotateBorder 5s linear infinite;
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+} */
+
+@keyframes rotateBorder {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.prompt-input {
+    border: none;
+    outline: none;
+    resize: none;
+    width: 100%;
+}

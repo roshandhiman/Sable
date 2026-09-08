@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-
+import './PromptBox.css';
 const FALLBACK_MODELS = [
   { id: 'groq-gpt120b', label: 'GPT-OSS 120B (Groq)' },
   { id: 'groq-gpt20b', label: 'GPT-OSS 20B (Groq)' },
@@ -26,7 +26,7 @@ export default function PromptBox() {
           setSelectedModel(data[0].id);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [])
 
   const selected = models.find((model) => model.id === selectedModel)
