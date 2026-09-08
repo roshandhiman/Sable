@@ -3,46 +3,33 @@
     position: relative;
     flex-direction: column;
     gap: 12px;
-    padding: 20px 18px;
-    /* background: transparent; */
-    background: rgba(255, 255, 255, 0.04);
-    /* border: 1px solid rgba(255, 255, 255, 0.15); */
-    border-radius: 40px;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    margin-bottom: 5%;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    /* background-color: grey; */
-    /*for the animation around */
+    padding: 28px 24px;
+    border-radius: 32px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     background-clip: padding-box;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
 }
 
-/* .prompt-box::before {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: 40px;
-    padding: 1px;
-    background: conic-gradient(from 0deg,
-            transparent 0%,
-            transparent 85%,
-            rgba(139, 92, 246, 1) 92%,
-            rgba(59, 130, 246, 1) 96%,
-            transparent 100%);
-    -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: rotateBorder 3s linear infinite;
-    pointer-events: none;
-} */
+.prompt-box.dark {
+    background: rgba(15, 15, 20, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+}
+
+.prompt-box.light {
+    background: rgba(255, 255, 255, 0.85);
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    color: #0f172a;
+}
+
 .prompt-box::before {
     content: "";
     position: absolute;
     inset: -2px;
-    border-radius: 40px;
+    border-radius: 32px;
     padding: 2px;
     background: linear-gradient(90deg,
             transparent,
@@ -60,6 +47,16 @@
     pointer-events: none;
 }
 
+.prompt-box.light::before {
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(99, 102, 241, 0.6),
+            rgba(14, 165, 233, 0.6),
+            rgba(99, 102, 241, 0.6),
+            transparent);
+    background-size: 300% 100%;
+}
+
 @keyframes borderFlow {
     from {
         background-position: 0% 50%;
@@ -75,4 +72,160 @@
     outline: none;
     resize: none;
     width: 100%;
+    font-size: 18px;
+    line-height: 1.6;
+    background: transparent;
+    font-family: inherit;
+    color: inherit;
+}
+
+.prompt-box.dark .prompt-input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.prompt-box.light .prompt-input::placeholder {
+    color: rgba(15, 23, 42, 0.4);
+}
+
+.prompt-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    position: relative;
+    z-index: 10;
+}
+
+.model-picker {
+    position: relative;
+}
+
+.model-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.prompt-box.dark .model-trigger {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+}
+
+.prompt-box.dark .model-trigger:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.prompt-box.light .model-trigger {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #0f172a;
+}
+
+.prompt-box.light .model-trigger:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+
+.model-chevron {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.model-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    width: 240px;
+    border-radius: 16px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 50;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+.prompt-box.dark .model-menu {
+    background: rgba(24, 24, 27, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+    color: #f8fafc;
+}
+
+.prompt-box.light .model-menu {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+    color: #0f172a;
+}
+
+.model-menu-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    opacity: 0.5;
+}
+
+.model-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    color: inherit;
+    transition: background 0.15s ease;
+}
+
+.prompt-box.dark .model-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.prompt-box.light .model-option:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.send-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    background: #ffffff;
+    color: #000000;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.prompt-box.light .send-button {
+    background: #000000;
+    color: #ffffff;
+}
+
+.send-button:hover {
+    opacity: 0.85;
+    transform: scale(1.02);
+}
+
+.send-button:active {
+    transform: scale(0.96);
 }

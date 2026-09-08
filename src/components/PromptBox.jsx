@@ -11,7 +11,7 @@ const FALLBACK_MODELS = [
   { id: 'nvidia-llama', label: 'Llama 3.3 70B' },
 ]
 
-export default function PromptBox() {
+export default function PromptBox({ isDarkMode = true }) {
   const [prompt, setPrompt] = useState('');
   const [models, setModels] = useState(FALLBACK_MODELS)
   const [selectedModel, setSelectedModel] = useState('groq-gpt120b')
@@ -41,7 +41,7 @@ export default function PromptBox() {
   }
 
   return (
-    <section className="prompt-box">
+    <section className={`prompt-box ${isDarkMode ? 'dark' : 'light'}`}>
       <textarea
         className="prompt-input"
         value={prompt}

@@ -1,8 +1,7 @@
 'use client';
-
 import React, { useEffect, useRef, useState } from 'react';
 import PromptBox from '../PromptBox';
-
+import ThemeToggle from '../ThemeToggle';
 interface Node {
   x: number;
   y: number;
@@ -14,32 +13,29 @@ interface Node {
   label: string;
   pulse: number;
 }
-
 export default function ConstellationGrid() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
-
+  const [userOverride, setUserOverride] = useState(false);
+  // System theme detect karne ke liye (agar user ne manually switch nahi kiya ho)
   useEffect(() => {
+    if (userOverride) return;
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     setIsDarkMode(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
-  }, []);
-
+  }, [userOverride]);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
-
     let animId: number;
     let width = 0;
     let height = 0;
-
     const mouse = { x: -1000, y: -1000, prevX: -1000, prevY: -1000, vx: 0, vy: 0, radius: 220 };
     let nodes: Node[] = [];
-
     const handleResize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = window.innerWidth;
@@ -92,7 +88,7 @@ export default function ConstellationGrid() {
       mouse.prevY = mouse.y;
       const speed = Math.sqrt(mouse.vx ** 2 + mouse.vy ** 2);
 
-      const bgColor = isDarkMode ? '#030407' : '#f8fafc';
+      const bgColor = isDarkMode ? '#030407' : '#ffffffff';
       const nodeColor = isDarkMode ? '255, 255, 255' : '15, 23, 42';
       const accentColor = isDarkMode ? '220, 220, 220' : '71, 71, 71';
 
@@ -150,13 +146,11 @@ export default function ConstellationGrid() {
         const dist = Math.sqrt(dx * dx + dy * dy);
         const near = dist < mouse.radius;
         const alpha = near ? 0.95 : 0.25 + Math.sin(n.pulse) * 0.1;
-
         ctx.fillStyle = `rgba(${near ? accentColor : nodeColor}, ${alpha})`;
         const r = near ? n.radius * 2.2 : n.radius + Math.sin(n.pulse) * 0.3;
         ctx.beginPath();
         ctx.arc(n.x, n.y, Math.max(0.5, r), 0, Math.PI * 2);
         ctx.fill();
-
         if (dist < 90) {
           const ring = ((n.pulse * 20) % 30) + 4;
           ctx.strokeStyle = `rgba(${accentColor}, ${(1 - ring / 34) * 0.4})`;
@@ -188,20 +182,36 @@ export default function ConstellationGrid() {
     <div className="relative w-full h-screen overflow-hidden select-none bg-slate-950">
       <canvas ref={canvasRef} className="absolute inset-0 block cursor-crosshair" />
 
-      <div className="relative z-10 flex h-full flex-col items-center justify-center text-center px-4 text-white">
+      {/* light ur Dark mode switch karne ke liye */}
+      <ThemeToggle
+        isDarkMode={isDarkMode}
+        onToggle={() => {
+          setUserOverride(true);
+          setIsDarkMode((prev) => !prev);
+        }}
+      />
+
+
+      {/* <div className="relative z-10 flex h-full flex-col items-center justify-center text-center px-4 text-white"> */}
+      <div className={`relative z-10 flex h-full flex-col items-center justify-center text-center px-4 ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
         <div className="pointer-events-none mix-blend-difference">
           <h1 className="font-mono text-7xl sm:text-9xl md:text-[15vw] font-black tracking-tighter uppercase leading-none">
             SABLE
           </h1>
+
           <p className="mt-6 font-mono text-sm md:text-base max-w-xl opacity-75 tracking-wider mx-auto">
             Type it. Sable builds it. Live in seconds.
           </p>
         </div>
+        <br></br>
+        <br></br>
+        <br></br>
 
-        <div className="mt-14 w-full" style={{ maxWidth: '620px' }}>
-          <PromptBox />
+
+        <div className="mt-14 w-full" style={{ maxWidth: '900px' }}>
+          <PromptBox isDarkMode={isDarkMode} />
         </div>
       </div>
-    </div>
+    </div >
   );
 }
