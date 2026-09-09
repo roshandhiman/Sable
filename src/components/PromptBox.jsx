@@ -17,6 +17,7 @@ export default function PromptBox({ isDarkMode = true }) {
   const [models, setModels] = useState(FALLBACK_MODELS)
   const [selectedModel, setSelectedModel] = useState('groq-gpt120b')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch('http://localhost:3001/models')
@@ -37,10 +38,13 @@ export default function PromptBox({ isDarkMode = true }) {
     setIsMenuOpen(false)
   }
 
+  // function sendPrompt() {
+  //   console.log('Prompt:', prompt, 'Model:', selectedModel)
+  // }
   function sendPrompt() {
-    console.log('Prompt:', prompt, 'Model:', selectedModel)
-  }
-
+  if (!prompt.trim()) return;
+  navigate('/workspace', { state: { prompt, model: selectedModel } });
+}
   return (
     <section className={`prompt-box ${isDarkMode ? 'dark' : 'light'}`}>
       <textarea
