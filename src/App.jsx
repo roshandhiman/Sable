@@ -1,9 +1,14 @@
 import ConstellationGrid from '@/components/ui/constellation-grid'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Workspace from './components/Workspace';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <ConstellationGrid />
-    </div>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<ConstellationGrid />} />
+        <Route path="/workspace" element={<Workspace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }

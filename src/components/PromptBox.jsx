@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import './PromptBox.css';
 const FALLBACK_MODELS = [
   { id: 'groq-gpt120b', label: 'GPT-OSS 120B (Groq)' },
