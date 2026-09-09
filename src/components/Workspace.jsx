@@ -16,19 +16,16 @@ export default function Workspace() {
 
   return (
     <div className="relative flex w-full h-screen bg-black text-white overflow-hidden p-6 gap-6">
-      {/* Background spider cursor effect */}
       <div className="absolute inset-0 z-0">
         <SpiderCursor />
       </div>
-
-      {/* Left: output/preview card */}
       <div
         className="relative z-10 w-1/2 h-full flex items-center justify-center"
         style={{
           borderRadius: '20px',
           background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
           border: '1px solid rgba(255, 255, 255, 0.12)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
         }}
@@ -37,12 +34,10 @@ export default function Workspace() {
           Output will render here...
         </p>
       </div>
-
-      {/* Right: thinking / code generation card */}
       <div
         className="relative z-10 w-1/2 h-full p-6 flex flex-col"
         style={{
-          borderRadius: '20px',
+          borderRadius: '30px',
           background: 'rgba(255, 255, 255, 0.05)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
