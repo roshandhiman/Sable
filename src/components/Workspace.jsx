@@ -29,11 +29,20 @@ export default function Workspace() {
       setDisplayedCode('');
 
       try {
-        const res = await fetch('http://localhost:3001/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model, history: [], prompt }),
-        });
+        const res = await fetch(
+  `${import.meta.env.PROD ? '/api' : 'http://localhost:3001'}/generate`,
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, history: [], prompt }),
+  }
+);
+//for local 
+        // const res = await fetch('http://localhost:3001/generate', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ model, history: [], prompt }),
+        // });
         const data = await res.json();
 
         if (data.error) {

@@ -10,8 +10,17 @@ app.use(express.json())
 app.get('/models', (req, res) => {
   res.json(modelList)
 })
-
-app.post('/generate', async (req, res) => {
+//local ke liye tha 
+// app.post('/generate', async (req, res) => {
+//   const { model, history, prompt } = req.body
+//   try {
+//     const result = await generate(model, history || [], prompt)
+//     res.json(result)
+//   } catch (err) {
+//     res.status(500).json({ error: err.message })
+//   }
+// })
+app.post('/api/generate', async (req, res) => {
   const { model, history, prompt } = req.body
   try {
     const result = await generate(model, history || [], prompt)
@@ -20,7 +29,6 @@ app.post('/generate', async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 })
-
 app.listen(process.env.PORT || 3001, () => {
   console.log(`Backend running on port ${process.env.PORT || 3001}`)
 })
