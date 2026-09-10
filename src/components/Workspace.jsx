@@ -140,6 +140,24 @@ export default function Workspace() {
           {displayedCode}
           {isTyping && <span className="animate-pulse">▊</span>}
         </pre>
+        <div>
+          <input
+            type="text"
+            placeholder="What Would You Like To Change?"
+            style={{
+              width: '100%',
+              padding: '2rem 1rem',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              borderRadius: '20px',
+              color: 'white',
+              background: 'rgba(255, 255, 255, 0.05)',
+              outline: 'none',
+            }}
+          />
+
+        </div>
       </div>
     </div>
   );
