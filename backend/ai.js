@@ -34,7 +34,7 @@ async function openaiCall(url, key, model, messages) {
 async function geminiCall(messages) {
   const text = messages.map(m => `${m.role}: ${m.content}`).join('\n')
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
