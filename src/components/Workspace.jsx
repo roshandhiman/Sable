@@ -30,27 +30,25 @@ export default function Workspace() {
 
       try {
         const res = await fetch(
-  `${import.meta.env.PROD ? '/api' : 'http://localhost:3001'}/generate`,
-  {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, history: [], prompt }),
-  }
-);
-//for local 
+          `${import.meta.env.PROD ? '/api' : 'http://localhost:3001'}/generate`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model, history: [], prompt }),
+          }
+        );
+        //for local 
         // const res = await fetch('http://localhost:3001/generate', {
         //   method: 'POST',
         //   headers: { 'Content-Type': 'application/json' },
         //   body: JSON.stringify({ model, history: [], prompt }),
         // });
         const data = await res.json();
-
         if (data.error) {
           setDisplayedCode(`// Error: ${data.error}`);
           setIsGenerating(false);
           return;
         }
-
         setFullCode(data.html);
         setUsedProvider(data.usedProvider);
         setIsGenerating(false);
@@ -68,7 +66,7 @@ export default function Workspace() {
     if (!fullCode || !isTyping) return;
 
     let i = 0;
-    const charsPerTick = 8;
+    const charsPerTick = 30;
     const interval = setInterval(() => {
       i += charsPerTick;
       setDisplayedCode(fullCode.slice(0, i));
@@ -86,7 +84,6 @@ export default function Workspace() {
       <div className="absolute inset-0 z-0">
         <SpiderCursor />
       </div>
-
       <div
         className="relative z-10 w-1/2 h-full flex items-center justify-center overflow-hidden"
         style={{
