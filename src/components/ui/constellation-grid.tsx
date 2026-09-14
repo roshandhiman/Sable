@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PromptBox from '../PromptBox';
 import ThemeToggle from '../ThemeToggle';
 interface Node {
@@ -14,6 +15,7 @@ interface Node {
   pulse: number;
 }
 export default function ConstellationGrid() {
+  const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [userOverride, setUserOverride] = useState(false);
@@ -181,6 +183,16 @@ export default function ConstellationGrid() {
   return (
     <div className="relative w-full h-screen overflow-hidden select-none bg-slate-950">
       <canvas ref={canvasRef} className="absolute inset-0 block cursor-crosshair" />
+
+      {/* COMPONENTS corner link */}
+      <button
+        onClick={() => navigate('/components')}
+        style={{ position: 'absolute', bottom: '1.5rem', left: '1.5rem', zIndex: 50, background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff', fontFamily: 'ui-monospace, monospace', fontSize: '0.7rem', letterSpacing: '0.15em', opacity: 0.6, textTransform: 'uppercase', padding: 0 }}
+        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+        onMouseLeave={e => (e.currentTarget.style.opacity = '0.6')}
+      >
+        COMPONENTS
+      </button>
 
       {/* light ur Dark mode switch karne ke liye */}
       <ThemeToggle
