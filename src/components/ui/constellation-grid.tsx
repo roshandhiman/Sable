@@ -218,6 +218,15 @@ export default function ConstellationGrid() {
         MY WORKS
       </button>
 
+      <button
+        onClick={() => navigate('/github')}
+        style={{ position: 'absolute', bottom: '1.5rem', left: '16.5rem', zIndex: 50, background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff', fontFamily: 'ui-monospace, monospace', fontSize: '0.7rem', letterSpacing: '0.15em', opacity: 0.6, textTransform: 'uppercase', padding: 0 }}
+        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+        onMouseLeave={e => (e.currentTarget.style.opacity = '0.6')}
+      >
+        GITHUB
+      </button>
+
       {authUser && (
         <div
           style={{ position: 'absolute', top: '2rem', right: '9rem', zIndex: 20, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem', letterSpacing: '0.08em', color: '#fff', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '999px', padding: '0.45rem 0.9rem', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', whiteSpace: 'nowrap', maxWidth: '12rem', overflow: 'hidden', textOverflow: 'ellipsis' }}

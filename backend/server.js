@@ -8,6 +8,7 @@ dotenv.config({ path: path.join(__dirname, '.env') })
 import express from 'express'
 import cors from 'cors'
 import { generate, generateStream, modelList } from './ai.js'
+import { githubLogin, githubCallback, githubUser, githubRepos, githubPush } from './github.js'
 
 const app = express()
 app.use(cors())
@@ -65,6 +66,17 @@ app.post('/api/generate', handleGenerate)
 
 app.post('/generate/stream', handleGenerateStream)
 app.post('/api/generate/stream', handleGenerateStream)
+
+app.get('/github/login', githubLogin)
+app.get('/api/github/login', githubLogin)
+app.get('/github/callback', githubCallback)
+app.get('/api/github/callback', githubCallback)
+app.get('/github/user', githubUser)
+app.get('/api/github/user', githubUser)
+app.get('/github/repos', githubRepos)
+app.get('/api/github/repos', githubRepos)
+app.post('/github/push', githubPush)
+app.post('/api/github/push', githubPush)
 
 const port = process.env.PORT || 3001
 app.listen(port, () => {

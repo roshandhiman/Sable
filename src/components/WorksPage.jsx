@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RippleDistortion from './ui/RippleDistortion';
+import { getGithubToken, ghFetch } from '../lib/github';
 
 function WorkModal({ work, onClose }) {
   const [tab, setTab] = useState('preview');
@@ -98,10 +99,162 @@ function WorkModal({ work, onClose }) {
   );
 }
 
+const slugify = (value) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60) || 'sable-work';
+
+function PushModal({ work, onClose }) {
+  const [repoName, setRepoName] = useState(() => slugify(work.title));
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [result, setResult] = useState(null);
+  const [connected] = useState(() => Boolean(getGithubToken()));
+
+  const handlePush = async () => {
+    if (!repoName.trim() || busy) return;
+    setBusy(true);
+    setError('');
+    try {
+      const data = await ghFetch('/github/push', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: repoName,
+          description: work.title,
+          private: isPrivate,
+          html: work.html,
+        }),
+      });
+      setResult(data);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1001,
+        background: 'rgba(0,0,0,0.85)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        backdropFilter: 'blur(8px)'
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: 'min(30rem, 90vw)',
+          background: '#000',
+          border: '1px solid rgba(255,255,255,0.15)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          fontFamily: 'ui-monospace, monospace',
+          color: '#fff'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Push to GitHub</h2>
+          <button
+            onClick={onClose}
+            style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: '1.3rem', lineHeight: 1, padding: 0 }}
+          >
+            ×
+          </button>
+        </div>
+
+        {!connected ? (
+          <div>
+            <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>
+              GitHub push connectivity will be added soon.
+            </p>
+            <p style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#fff' }}>Coming soon</p>
+          </div>
+        ) : (
+          <div>
+            <label style={{ display: 'block', fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginBottom: '0.4rem' }}>
+              Repository name
+            </label>
+            <input
+              value={repoName}
+              onChange={e => setRepoName(e.target.value)}
+              disabled={busy || Boolean(result)}
+              style={{
+                width: '100%', boxSizing: 'border-box', padding: '0.75rem 0.9rem',
+                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: '8px', color: '#fff', outline: 'none',
+                fontFamily: 'inherit', fontSize: '0.85rem', marginBottom: '0.9rem'
+              }}
+            />
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'rgba(255,255,255,0.65)', marginBottom: '1rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={isPrivate}
+                disabled={busy || Boolean(result)}
+                onChange={e => setIsPrivate(e.target.checked)}
+              />
+              Private repository
+            </label>
+
+            {error && <p style={{ margin: '0 0 0.8rem', fontSize: '0.8rem', color: '#f87171' }}>{error}</p>}
+
+            {result ? (
+              <div style={{ border: '1px solid rgba(255,255,255,0.15)', borderRadius: '10px', padding: '0.9rem', background: 'rgba(255,255,255,0.04)' }}>
+                <p style={{ margin: '0 0 0.6rem', fontSize: '0.82rem', color: 'rgba(255,255,255,0.7)' }}>
+                  {result.created ? 'Repository created and' : 'Pushed to'} index.html
+                </p>
+                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  <a
+                    href={result.repo_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ fontSize: '0.8rem', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '6px', padding: '0.35rem 0.8rem', textDecoration: 'none' }}
+                  >
+                    Open repo ↗
+                  </a>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', padding: '0.35rem 0.8rem', cursor: 'pointer', fontFamily: 'inherit' }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handlePush}
+                disabled={busy || !repoName.trim()}
+                style={{
+                  background: '#fff', color: '#000', border: 'none',
+                  padding: '0.7rem 1.3rem', borderRadius: '8px',
+                  cursor: busy ? 'wait' : 'pointer', fontFamily: 'inherit',
+                  fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.05em',
+                  opacity: busy || !repoName.trim() ? 0.6 : 1
+                }}
+              >
+                {busy ? 'Pushing…' : 'Create repo & push'}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function WorksPage() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(null);
   const [works, setWorks] = useState(() => JSON.parse(localStorage.getItem('sable_works') || '[]').reverse());
+  const [pushTarget, setPushTarget] = useState(null);
 
   const handleDelete = (e, savedAt) => {
     e.stopPropagation();
@@ -200,8 +353,26 @@ export default function WorksPage() {
                       {new Date(work.savedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </p>
                   </div>
-                  <button
-                    onClick={(e) => handleDelete(e, work.savedAt)}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setPushTarget(work); }}
+                      title="Push to GitHub"
+                      aria-label="Push to GitHub"
+                      style={{
+                        background: 'transparent', border: 'none', color: '#ffffff',
+                        opacity: 0.75, cursor: 'pointer', padding: '0.35rem',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1.18)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.opacity = '0.75'; e.currentTarget.style.transform = 'scale(1)'; }}
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 .5C5.73.5.99 5.24.99 11.5c0 4.86 3.15 8.98 7.52 10.44.55.1.75-.24.75-.53v-1.86c-3.06.67-3.71-1.48-3.71-1.48-.5-1.28-1.23-1.62-1.23-1.62-1-.69.08-.67.08-.67 1.11.08 1.7 1.14 1.7 1.14.99 1.7 2.6 1.21 3.23.93.1-.72.39-1.21.7-1.49-2.44-.28-5.01-1.22-5.01-5.44 0-1.2.43-2.18 1.13-2.95-.11-.28-.49-1.4.11-2.92 0 0 .93-.3 3.05 1.13a10.5 10.5 0 0 1 5.56 0c2.11-1.43 3.04-1.13 3.04-1.13.6 1.52.22 2.64.11 2.92.7.77 1.13 1.75 1.13 2.95 0 4.23-2.58 5.16-5.03 5.43.4.34.75 1.02.75 2.05v3.04c0 .29.2.64.76.53 4.36-1.46 7.5-5.58 7.5-10.44C23.01 5.24 18.27.5 12 .5z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={(e) => handleDelete(e, work.savedAt)}
                     title="Delete card"
                     aria-label="Delete card"
                     style={{
@@ -227,7 +398,8 @@ export default function WorksPage() {
                       <line x1="10" y1="11" x2="10" y2="17"/>
                       <line x1="14" y1="11" x2="14" y2="17"/>
                     </svg>
-                  </button>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -236,6 +408,7 @@ export default function WorksPage() {
       </div>
 
       {selected && <WorkModal work={selected} onClose={() => setSelected(null)} />}
+      {pushTarget && <PushModal work={pushTarget} onClose={() => setPushTarget(null)} />}
     </div>
   );
 }

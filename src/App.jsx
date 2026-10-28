@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Workspace from './components/Workspace';
 import ComponentsPage from './components/ComponentsPage';
 import WorksPage from './components/WorksPage';
+import GithubPage from './components/GithubPage';
+import GithubCallbackPage from './components/GithubCallbackPage';
 import NotFoundPage from './components/NotFoundPage';
 
 export default function App() {
@@ -14,6 +16,8 @@ export default function App() {
         <Route path="/components" element={<ComponentsPage />} />
         <Route path="/components/*" element={<ComponentsPage />} />
         <Route path="/works" element={<WorksPage />} />
+        <Route path="/github" element={<GithubPage />} />
+        <Route path="/github/callback" element={<GithubCallbackPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
