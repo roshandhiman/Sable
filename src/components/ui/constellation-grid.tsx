@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PromptBox from '../PromptBox';
 import ThemeToggle from '../ThemeToggle';
+import AuthModal from '../AuthModal';
 interface Node {
   x: number;
   y: number;
@@ -19,7 +20,7 @@ export default function ConstellationGrid() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [userOverride, setUserOverride] = useState(false);
-  // System theme detect karne ke liye (agar user ne manually switch nahi kiya ho)
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   useEffect(() => {
     if (userOverride) return;
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -78,65 +79,65 @@ export default function ConstellationGrid() {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
 
-    let lastTime=performance.now();
+    let lastTime = performance.now();
 
     const render = (now: number) => {
-    const dt = Math.min((now - lastTime) / 1000, 0.05);
-  lastTime=now;
+      const dt = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime = now;
 
-      mouse.vx=(mouse.x-mouse.prevX)/(dt*1000||1);
-    mouse.vy=(mouse.y-mouse.prevY)/(dt*1000||1);
-      mouse.prevX=mouse.x;
-      mouse.prevY=mouse.y;
-      const speed=Math.sqrt(mouse.vx**2 + mouse.vy**2);
+      mouse.vx = (mouse.x - mouse.prevX) / (dt * 1000 || 1);
+      mouse.vy = (mouse.y - mouse.prevY) / (dt * 1000 || 1);
+      mouse.prevX = mouse.x;
+      mouse.prevY = mouse.y;
+      const speed = Math.sqrt(mouse.vx ** 2 + mouse.vy ** 2);
 
-      const bgColor=isDarkMode?'#030407':'#fdfdfdff';
-  const nodeColor=isDarkMode?'255, 255, 255':'15, 23, 42';
-      const accentColor=isDarkMode?'220, 220, 220':'71, 71, 71';
+      const bgColor = isDarkMode ? '#030407' : '#fdfdfdff';
+      const nodeColor = isDarkMode ? '255, 255, 255' : '15, 23, 42';
+      const accentColor = isDarkMode ? '220, 220, 220' : '71, 71, 71';
 
-    ctx.fillStyle=bgColor;
-      ctx.fillRect(0,0,width,height);
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, width, height);
 
-      const SPRING=18;
-      const DAMP=0.82;
+      const SPRING = 18;
+      const DAMP = 0.82;
 
-      for(const n of nodes){
-        n.pulse+=dt*3;
-        const dx=mouse.x-n.x;
-       const dy=mouse.y-n.y;
-        const dist=Math.sqrt(dx*dx+dy*dy);
+      for (const n of nodes) {
+        n.pulse += dt * 3;
+        const dx = mouse.x - n.x;
+        const dy = mouse.y - n.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if(dist<mouse.radius && dist>0){
-        const power=1-dist/mouse.radius;
-          const force=power*(1500+speed*150);
-          const angle=Math.atan2(dy,dx);
-          n.vx-=Math.cos(angle)*force*dt;
-         n.vy-=Math.sin(angle)*force*dt;
+        if (dist < mouse.radius && dist > 0) {
+          const power = 1 - dist / mouse.radius;
+          const force = power * (1500 + speed * 150);
+          const angle = Math.atan2(dy, dx);
+          n.vx -= Math.cos(angle) * force * dt;
+          n.vy -= Math.sin(angle) * force * dt;
         }
 
-        n.vx+=(n.baseX-n.x)*SPRING*dt;
-        n.vy+=(n.baseY-n.y)*SPRING*dt;
-       n.vx*=DAMP;
-        n.vy*=DAMP;
-        n.x+=n.vx*dt*60;
-        n.y+=n.vy*dt*60;
+        n.vx += (n.baseX - n.x) * SPRING * dt;
+        n.vy += (n.baseY - n.y) * SPRING * dt;
+        n.vx *= DAMP;
+        n.vy *= DAMP;
+        n.x += n.vx * dt * 60;
+        n.y += n.vy * dt * 60;
       }
 
-      const MAX_DIST=75;
-      const MAX_SQ=MAX_DIST*MAX_DIST;
+      const MAX_DIST = 75;
+      const MAX_SQ = MAX_DIST * MAX_DIST;
 
-      for(let i=0;i<nodes.length;i++){
-        for(let j=i+1;j<nodes.length;j++){
-         const dx=nodes[i].x-nodes[j].x;
-          const dy=nodes[i].y-nodes[j].y;
-          const sq=dx*dx+dy*dy;
-          if(sq<MAX_SQ){
-            const d=Math.sqrt(sq);
-            ctx.strokeStyle=`rgba(${nodeColor}, ${(1-d/MAX_DIST)*(isDarkMode?0.18:0.08)})`;
-            ctx.lineWidth=0.7;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const sq = dx * dx + dy * dy;
+          if (sq < MAX_SQ) {
+            const d = Math.sqrt(sq);
+            ctx.strokeStyle = `rgba(${nodeColor}, ${(1 - d / MAX_DIST) * (isDarkMode ? 0.18 : 0.08)})`;
+            ctx.lineWidth = 0.7;
             ctx.beginPath();
-            ctx.moveTo(nodes[i].x,nodes[i].y);
-            ctx.lineTo(nodes[j].x,nodes[j].y);
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
             ctx.stroke();
           }
         }
@@ -181,8 +182,8 @@ export default function ConstellationGrid() {
   }, [isDarkMode]);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden select-none bg-slate-950">
-      <canvas ref={canvasRef} className="absolute inset-0 block cursor-crosshair" />
+    <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', userSelect: 'none', background: '#030407' }}>
+      <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'block', cursor: 'crosshair', width: '100%', height: '100%' }} />
 
       {/* COMPONENTS corner link */}
       <button
@@ -203,7 +204,18 @@ export default function ConstellationGrid() {
         MY WORKS
       </button>
 
-      {/* light ur Dark mode switch karne ke liye */}
+      <button
+        onClick={() => setIsAuthOpen(true)}
+        style={{ position: 'absolute', top: '1.5rem', right: '5.5rem', zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '2.75rem', height: '2.75rem', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', background: 'rgba(255,255,255,0.05)', cursor: 'pointer', transition: 'background 0.2s' }}
+        aria-label="Account"
+        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
+        onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" style={{ width: '1.25rem', height: '1.25rem', color: '#fff' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      </button>
+
       <ThemeToggle
         isDarkMode={isDarkMode}
         onToggle={() => {
@@ -212,24 +224,22 @@ export default function ConstellationGrid() {
         }}
       />
 
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
-      {/* <div className="relative z-10 flex h-full flex-col items-center justify-center text-center px-4 text-white"> */}
-      <div className={`relative z-10 flex h-full flex-col items-center justify-center text-center px-4 ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
-        <div className="pointer-events-none mix-blend-difference">
-          <h1 className="font-mono text-7xl sm:text-9xl md:text-[15vw] font-black tracking-tighter uppercase leading-none">
+
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', height: '100%', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1rem', color: isDarkMode ? '#fff' : '#0f172a' }}>
+        <div style={{ pointerEvents: 'none' }}>
+          <h1 style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 'clamp(4rem, 15vw, 13rem)', fontWeight: 900, letterSpacing: '-0.04em', textTransform: 'uppercase', lineHeight: 1, margin: 0 }}>
             SABLE
           </h1>
-
-          <p className="mt-6 font-mono text-sm md:text-base max-w-xl opacity-75 tracking-wider mx-auto">
+          <p style={{ marginTop: '1.5rem', fontFamily: 'ui-monospace, monospace', fontSize: 'clamp(0.75rem, 1.5vw, 1rem)', opacity: 0.6, letterSpacing: '0.12em', maxWidth: '36rem', margin: '1.5rem auto 0' }}>
             Type it. Sable builds it. Live in seconds.
           </p>
         </div>
         <br></br>
         <br></br>
-        <br></br>
 
-
-        <div className="mt-14 w-full" style={{ maxWidth: '900px' }}>
+        <div style={{ marginTop: '3.5rem', width: '100%', maxWidth: '900px' }}>
           <PromptBox isDarkMode={isDarkMode} />
         </div>
       </div>
