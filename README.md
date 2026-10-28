@@ -1,10 +1,6 @@
-<div align="center">
+# Sable
 
-# SABLE
-
-
-
-SABLE is an AI-powered landing page generator. Describe what you want — SABLE writes the full HTML, CSS, and JS and renders it live in your browser. No sign-up. No setup.
-
-
----
+Sable is an AI website builder for creating landing pages from a simple prompt.
+It generates a complete website and shows a live preview in the browser.
+You can save projects, deploy them on your Sable domain, and share the public link.
+People with the link can open and view the published website.
