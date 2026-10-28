@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { Home } from 'lucide-react';
+import { saveWork } from '../lib/supabase';
 import { SpiderCursor } from './ui/SpyderCursor';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-tomorrow.css';
@@ -126,9 +127,11 @@ export default function Workspace() {
           setError(streamError || 'No output received');
           return;
         }
-        const existing = JSON.parse(localStorage.getItem('sable_works') || '[]');
-        existing.push({ title: prompt, html, savedAt: Date.now() });
-        localStorage.setItem('sable_works', JSON.stringify(existing));
+        try {
+          await saveWork(prompt, html);
+        } catch (saveError) {
+          console.warn('Could not save work:', saveError);
+        }
       } catch (err) {
         if (cancelled || err.name === 'AbortError') return;
         setError(err.message);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import SplashCursor from './ui/SplashCursor';
+import { supabase } from '../lib/supabase';
 
 const inputStyle = {
   width: '100%',
@@ -35,39 +36,59 @@ const blurInput = (e) => {
 
 export default function AuthModal({ isOpen, onClose }) {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => setMounted(true), 10);
-      document.body.style.overflow = 'hidden';
-    } else {
-      setMounted(false);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    const timer = setTimeout(() => setMounted(isOpen), 10);
+    return () => {
+      clearTimeout(timer);
       document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username.trim() || !password.trim()) return;
+    const mail = email.trim();
+    if (!mail || !password) return;
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 800));
-    localStorage.setItem('sable_user', username.trim());
-    window.dispatchEvent(new Event('sable-auth'));
-    setIsLoading(false);
-    onClose();
+    setError('');
+    try {
+      if (!supabase) throw new Error('Supabase is not configured yet (set VITE_SUPABASE_URL in .env)');
+      if (isSignUp) {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email: mail,
+          password,
+          options: { data: { name: mail.split('@')[0] } },
+        });
+        if (signUpError) throw signUpError;
+        if (!data.session) throw new Error('Confirm your email first, then sign in.');
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: mail,
+          password,
+        });
+        if (signInError) throw signInError;
+      }
+      setIsLoading(false);
+      onClose();
+    } catch (err) {
+      setError(err.message || 'Authentication failed');
+      setIsLoading(false);
+    }
   };
 
   const handleTabSwitch = (signUp) => {
     setIsSignUp(signUp);
-    setUsername('');
+    setEmail('');
     setPassword('');
+    setError('');
   };
 
   return (
@@ -176,10 +197,10 @@ export default function AuthModal({ isOpen, onClose }) {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={labelStyle}>Username</label>
+            <label style={labelStyle}>Email</label>
             <input
-              type="text" value={username} onChange={(e) => setUsername(e.target.value)}
-              placeholder="your_username" required autoComplete="username" style={inputStyle}
+              type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com" required autoComplete="email" style={inputStyle}
               onFocus={focusInput}
               onBlur={blurInput}
             />
@@ -194,6 +215,20 @@ export default function AuthModal({ isOpen, onClose }) {
               onBlur={blurInput}
             />
           </div>
+
+          {error && (
+            <p
+              style={{
+                margin: 0,
+                fontSize: '0.75rem',
+                lineHeight: 1.5,
+                color: '#f87171',
+                fontFamily: 'inherit',
+              }}
+            >
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"

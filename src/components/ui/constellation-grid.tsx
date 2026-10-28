@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import PromptBox from '../PromptBox';
 import ThemeToggle from '../ThemeToggle';
 import AuthModal from '../AuthModal';
+import { displayName, getSessionUser, supabase } from '../../lib/supabase';
 interface Node {
   x: number;
   y: number;
@@ -21,18 +22,17 @@ export default function ConstellationGrid() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [userOverride, setUserOverride] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [authUser, setAuthUser] = useState<string | null>(() => localStorage.getItem('sable_user'));
+  const [authUser, setAuthUser] = useState<string | null>(null);
   useEffect(() => {
-    const syncAuth = () => setAuthUser(localStorage.getItem('sable_user'));
-    window.addEventListener('sable-auth', syncAuth);
-    window.addEventListener('storage', syncAuth);
-    return () => {
-      window.removeEventListener('sable-auth', syncAuth);
-      window.removeEventListener('storage', syncAuth);
-    };
+    if (!supabase) return;
+    getSessionUser().then((user) => setAuthUser(user ? displayName(user) : null));
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthUser(session?.user ? displayName(session.user) : null);
+    });
+    return () => data.subscription.unsubscribe();
   }, []);
-  const handleLogout = () => {
-    localStorage.removeItem('sable_user');
+  const handleLogout = async () => {
+    if (supabase) await supabase.auth.signOut();
     setAuthUser(null);
   };
   useEffect(() => {

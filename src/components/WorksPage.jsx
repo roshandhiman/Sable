@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RippleDistortion from './ui/RippleDistortion';
 import { getGithubToken, ghFetch } from '../lib/github';
+import { deleteWork, loadWorks } from '../lib/supabase';
 
 function WorkModal({ work, onClose }) {
   const [tab, setTab] = useState('preview');
@@ -253,15 +254,39 @@ function PushModal({ work, onClose }) {
 export default function WorksPage() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(null);
-  const [works, setWorks] = useState(() => JSON.parse(localStorage.getItem('sable_works') || '[]').reverse());
+  const [works, setWorks] = useState([]);
+  const [loadingWorks, setLoadingWorks] = useState(true);
+  const [worksError, setWorksError] = useState('');
   const [pushTarget, setPushTarget] = useState(null);
 
-  const handleDelete = (e, savedAt) => {
+  useEffect(() => {
+    let active = true;
+    loadWorks()
+      .then((list) => {
+        if (active) setWorks(list);
+      })
+      .catch((e) => {
+        if (active) setWorksError(e.message);
+      })
+      .finally(() => {
+        if (active) setLoadingWorks(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleDelete = async (e, savedAt) => {
     e.stopPropagation();
-    const raw = JSON.parse(localStorage.getItem('sable_works') || '[]');
-    const updated = raw.filter(w => w.savedAt !== savedAt);
-    localStorage.setItem('sable_works', JSON.stringify(updated));
-    setWorks(updated.slice().reverse());
+    const target = works.find((w) => w.savedAt === savedAt);
+    if (!target) return;
+    try {
+      await deleteWork(target);
+    } catch (err) {
+      setWorksError(err.message);
+      return;
+    }
+    setWorks((prev) => prev.filter((w) => w.savedAt !== savedAt));
     if (selected && selected.savedAt === savedAt) {
       setSelected(null);
     }
@@ -303,7 +328,15 @@ export default function WorksPage() {
           </button>
         </div>
 
-        {works.length === 0 ? (
+        {loadingWorks ? (
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'ui-monospace, monospace', fontSize: '0.9rem' }}>
+            Loading your works...
+          </p>
+        ) : worksError ? (
+          <p style={{ color: '#f87171', fontFamily: 'ui-monospace, monospace', fontSize: '0.9rem' }}>
+            {worksError}
+          </p>
+        ) : works.length === 0 ? (
           <p style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'ui-monospace, monospace', fontSize: '0.9rem' }}>
             No works yet. Generate something first.
           </p>
