@@ -58,6 +58,8 @@ export default function AuthModal({ isOpen, onClose }) {
     if (!username.trim() || !password.trim()) return;
     setIsLoading(true);
     await new Promise(r => setTimeout(r, 800));
+    localStorage.setItem('sable_user', username.trim());
+    window.dispatchEvent(new Event('sable-auth'));
     setIsLoading(false);
     onClose();
   };

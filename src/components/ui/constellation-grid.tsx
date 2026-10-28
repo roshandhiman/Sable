@@ -21,6 +21,20 @@ export default function ConstellationGrid() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [userOverride, setUserOverride] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authUser, setAuthUser] = useState<string | null>(() => localStorage.getItem('sable_user'));
+  useEffect(() => {
+    const syncAuth = () => setAuthUser(localStorage.getItem('sable_user'));
+    window.addEventListener('sable-auth', syncAuth);
+    window.addEventListener('storage', syncAuth);
+    return () => {
+      window.removeEventListener('sable-auth', syncAuth);
+      window.removeEventListener('storage', syncAuth);
+    };
+  }, []);
+  const handleLogout = () => {
+    localStorage.removeItem('sable_user');
+    setAuthUser(null);
+  };
   useEffect(() => {
     if (userOverride) return;
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -204,16 +218,30 @@ export default function ConstellationGrid() {
         MY WORKS
       </button>
 
+      {authUser && (
+        <div
+          style={{ position: 'absolute', top: '2rem', right: '9rem', zIndex: 20, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem', letterSpacing: '0.08em', color: '#fff', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '999px', padding: '0.45rem 0.9rem', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', whiteSpace: 'nowrap', maxWidth: '12rem', overflow: 'hidden', textOverflow: 'ellipsis' }}
+        >
+          {authUser}
+        </div>
+      )}
+
       <button
-        onClick={() => setIsAuthOpen(true)}
+        onClick={authUser ? handleLogout : () => setIsAuthOpen(true)}
         style={{ position: 'absolute', top: '1.5rem', right: '5.5rem', zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '2.75rem', height: '2.75rem', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', background: 'rgba(255,255,255,0.05)', cursor: 'pointer', transition: 'background 0.2s' }}
-        aria-label="Account"
+        aria-label={authUser ? 'Logout' : 'Account'}
         onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
         onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" style={{ width: '1.25rem', height: '1.25rem', color: '#fff' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
+        {authUser ? (
+          <svg xmlns="http://www.w3.org/2000/svg" style={{ width: '1.25rem', height: '1.25rem', color: '#fff' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" style={{ width: '1.25rem', height: '1.25rem', color: '#fff' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        )}
       </button>
 
       <ThemeToggle
