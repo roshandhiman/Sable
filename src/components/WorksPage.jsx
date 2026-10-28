@@ -251,6 +251,55 @@ function PushModal({ work, onClose }) {
   );
 }
 
+function DeployModal({ work, onClose }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [link, setLink] = useState('');
+
+  const deploy = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      const data = await ghFetch('/publish', {
+        method: 'POST',
+        body: JSON.stringify({ title: work.title, html: work.html }),
+      });
+      const url = `${window.location.origin}/deployed/${data.slug}`;
+      setLink(url);
+      navigator.clipboard?.writeText(url).catch(() => {});
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 1001, background: 'rgba(0,0,0,0.85)', display: 'grid', placeItems: 'center', backdropFilter: 'blur(8px)' }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: 'min(30rem, 90vw)', background: '#000', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '16px', padding: '1.5rem', fontFamily: 'ui-monospace, monospace', color: '#fff' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.7rem' }}>
+          <h2 style={{ margin: 0, fontSize: '1rem' }}>Deploy project</h2>
+          <button onClick={onClose} style={{ background: 'transparent', border: 0, color: '#fff', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
+        </div>
+        {!link ? <>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem', lineHeight: 1.5 }}>Publish this project on your Sable domain and get a shareable link.</p>
+          {error && <p style={{ color: '#f87171', fontSize: '0.8rem' }}>{error}</p>}
+          <button type="button" onClick={deploy} disabled={busy} style={{ background: '#fff', color: '#000', border: 0, borderRadius: '8px', padding: '0.7rem 1.1rem', cursor: busy ? 'wait' : 'pointer', fontFamily: 'inherit', fontWeight: 700 }}>
+            {busy ? 'Deploying…' : 'Deploy'}
+          </button>
+        </> : <>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.82rem', lineHeight: 1.5 }}>Your website is live. The link has been copied.</p>
+          <input value={link} readOnly onFocus={e => e.currentTarget.select()} style={{ width: '100%', boxSizing: 'border-box', padding: '0.7rem', background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.16)', borderRadius: '7px', fontFamily: 'inherit', fontSize: '0.72rem' }} />
+          <div style={{ marginTop: '0.8rem', display: 'flex', gap: '0.6rem' }}>
+            <a href={link} target="_blank" rel="noreferrer" style={{ color: '#000', background: '#fff', padding: '0.55rem 0.8rem', borderRadius: '7px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 700 }}>Open site ↗</a>
+            <button type="button" onClick={() => navigator.clipboard?.writeText(link)} style={{ color: '#fff', background: 'transparent', padding: '0.55rem 0.8rem', borderRadius: '7px', border: '1px solid rgba(255,255,255,0.2)', fontFamily: 'inherit', cursor: 'pointer' }}>Copy link</button>
+          </div>
+        </>}
+      </div>
+    </div>
+  );
+}
+
 export default function WorksPage() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(null);
@@ -258,6 +307,7 @@ export default function WorksPage() {
   const [loadingWorks, setLoadingWorks] = useState(true);
   const [worksError, setWorksError] = useState('');
   const [pushTarget, setPushTarget] = useState(null);
+  const [deployTarget, setDeployTarget] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -405,6 +455,19 @@ export default function WorksPage() {
                       </svg>
                     </button>
                     <button
+                      onClick={(e) => { e.stopPropagation(); setDeployTarget(work); }}
+                      title="Deploy and share"
+                      aria-label="Deploy and share"
+                      style={{ background: 'transparent', border: 'none', color: '#ffffff', opacity: 0.75, cursor: 'pointer', padding: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease' }}
+                      onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1.18)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.opacity = '0.75'; e.currentTarget.style.transform = 'scale(1)'; }}
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="m22 2-7 20-4-9-9-4Z" />
+                        <path d="M22 2 11 13" />
+                      </svg>
+                    </button>
+                    <button
                       onClick={(e) => handleDelete(e, work.savedAt)}
                     title="Delete card"
                     aria-label="Delete card"
@@ -442,6 +505,7 @@ export default function WorksPage() {
 
       {selected && <WorkModal work={selected} onClose={() => setSelected(null)} />}
       {pushTarget && <PushModal work={pushTarget} onClose={() => setPushTarget(null)} />}
+      {deployTarget && <DeployModal work={deployTarget} onClose={() => setDeployTarget(null)} />}
     </div>
   );
 }

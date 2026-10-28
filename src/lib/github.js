@@ -1,6 +1,6 @@
 const TOKEN_KEY = 'sable_github_token';
 
-export const apiBase = () => (import.meta.env.PROD ? '/api' : 'http://localhost:3001');
+export const apiBase = () => '/api';
 
 export const getGithubToken = () => localStorage.getItem(TOKEN_KEY) || '';
 

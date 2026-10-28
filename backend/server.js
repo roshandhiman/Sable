@@ -4,11 +4,13 @@ import dotenv from 'dotenv'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 dotenv.config({ path: path.join(__dirname, '.env') })
+dotenv.config({ path: path.join(__dirname, '../.env') })
 
 import express from 'express'
 import cors from 'cors'
 import { generate, generateStream, modelList } from './ai.js'
 import { githubLogin, githubCallback, githubUser, githubRepos, githubPush } from './github.js'
+import { getPublishedWork, publishWork } from './publish.js'
 
 const app = express()
 app.use(cors())
@@ -66,6 +68,11 @@ app.post('/api/generate', handleGenerate)
 
 app.post('/generate/stream', handleGenerateStream)
 app.post('/api/generate/stream', handleGenerateStream)
+
+app.post('/publish', publishWork)
+app.post('/api/publish', publishWork)
+app.get('/published/:slug', getPublishedWork)
+app.get('/api/published/:slug', getPublishedWork)
 
 app.get('/github/login', githubLogin)
 app.get('/api/github/login', githubLogin)

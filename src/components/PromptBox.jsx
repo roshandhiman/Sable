@@ -19,8 +19,7 @@ export default function PromptBox({ isDarkMode = true }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const navigate = useNavigate();
   useEffect(() => {
-    const API_URL=import.meta.env.PROD ? '/api' : 'http://localhost:3001';
-    fetch(`${API_URL}/models`)
+    fetch('/api/models')
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data) && data.length) {

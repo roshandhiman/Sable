@@ -68,8 +68,7 @@ export default function Workspace() {
       setUsedProvider('');
       setError('');
       try {
-        const api = import.meta.env.PROD ? '/api' : 'http://localhost:3001';
-        const res = await fetch(`${api}/generate/stream`, {
+        const res = await fetch('/api/generate/stream', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ model, history: [], prompt }),
