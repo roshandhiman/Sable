@@ -1,8 +1,9 @@
 import ConstellationGrid from '@/components/ui/constellation-grid';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Workspace from './components/Workspace';
 import ComponentsPage from './components/ComponentsPage';
 import WorksPage from './components/WorksPage';
+import NotFoundPage from './components/NotFoundPage';
 
 export default function App() {
   return (
@@ -13,7 +14,7 @@ export default function App() {
         <Route path="/components" element={<ComponentsPage />} />
         <Route path="/components/*" element={<ComponentsPage />} />
         <Route path="/works" element={<WorksPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
