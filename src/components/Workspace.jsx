@@ -1,5 +1,6 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useMemo, useRef } from 'react';
+import { Home } from 'lucide-react';
 import { SpiderCursor } from './ui/SpyderCursor';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-tomorrow.css';
@@ -9,83 +10,149 @@ import 'prismjs/components/prism-javascript';
 
 export default function Workspace() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { prompt, model } = location.state || {};
   const [dots, setDots] = useState('');
   const [fullCode, setFullCode] = useState('');
   const [displayedCode, setDisplayedCode] = useState('');
   const [isGenerating, setIsGenerating] = useState(true);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [usedProvider, setUsedProvider] = useState('');
+  const [error, setError] = useState('');
   const codeContainerRef = useRef(null);
 
   useEffect(() => {
-    if (!isGenerating) return;
+    if (!isGenerating && !isStreaming) return;
     const interval = setInterval(() => {
       setDots((d) => (d.length >= 3 ? '' : d + '.'));
     }, 400);
     return () => clearInterval(interval);
-  }, [isGenerating]);
+  }, [isGenerating, isStreaming]);
 
   useEffect(() => {
     if (!prompt) return;
-    async function fetchGeneration() {
+    const controller = new AbortController();
+    let cancelled = false;
+    let raw = '';
+    let streamError = '';
+    let codeTimer = null;
+    let previewTimer = null;
+
+    const cleanLive = (s) =>
+      s
+        .replace(/^```(?:html)?\s*/i, '')
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/(^|[ \t])\/\/[^\r\n]*/gm, '$1')
+        .trim();
+
+    const flushCode = () => {
+      codeTimer = null;
+      if (!cancelled) setDisplayedCode(cleanLive(raw));
+    };
+    const flushPreview = () => {
+      previewTimer = null;
+      if (!cancelled) setFullCode(cleanLive(raw));
+    };
+    const schedule = () => {
+      if (codeTimer === null) codeTimer = setTimeout(flushCode, 100);
+      if (previewTimer === null) previewTimer = setTimeout(flushPreview, 400);
+    };
+
+    async function run() {
       setIsGenerating(true);
-      setFullCode('');
+      setIsStreaming(false);
       setDisplayedCode('');
+      setFullCode('');
+      setUsedProvider('');
+      setError('');
       try {
         const api = import.meta.env.PROD ? '/api' : 'http://localhost:3001';
-        const res = await fetch(`${api}/generate`, {
+        const res = await fetch(`${api}/generate/stream`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ model, history: [], prompt }),
+          signal: controller.signal,
         });
-        const data = await res.json();
-        if (data.error) throw new Error(data.error);
-        const raw = data.html?.replace(/^```html\s*|^```\s*|```$/g, '').trim() || '';
-        const html = raw
-          .replace(/<!--[\s\S]*?-->/g, '')
-          .replace(/\/\*[\s\S]*?\*\//g, '')
-          .replace(/(^|[ \t])\/\/[^\r\n]*/gm, '$1')
-          .trim();
+        if (!res.ok || !res.body) throw new Error(`Request failed (${res.status})`);
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let received = false;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+          for (const line of lines) {
+            const t = line.trim();
+            if (!t.startsWith('data:')) continue;
+            const payload = t.slice(5).trim();
+            if (!payload || payload === '[DONE]') continue;
+            let event;
+            try {
+              event = JSON.parse(payload);
+            } catch {
+              continue;
+            }
+            if (event.type === 'meta') {
+              setUsedProvider(event.provider);
+            } else if (event.type === 'error') {
+              streamError = event.message;
+            } else if (event.type === 'delta') {
+              if (!received) {
+                received = true;
+                setIsGenerating(false);
+                setIsStreaming(true);
+              }
+              raw += event.text;
+              schedule();
+            }
+          }
+        }
+
+        const html = cleanLive(raw);
+        if (cancelled) return;
+        if (codeTimer) clearTimeout(codeTimer);
+        if (previewTimer) clearTimeout(previewTimer);
+        setDisplayedCode(html);
         setFullCode(html);
-        setUsedProvider(data.usedProvider);
         setIsGenerating(false);
-        setIsTyping(true);
+        setIsStreaming(false);
+        if (!html) {
+          setError(streamError || 'No output received');
+          return;
+        }
         const existing = JSON.parse(localStorage.getItem('sable_works') || '[]');
         existing.push({ title: prompt, html, savedAt: Date.now() });
         localStorage.setItem('sable_works', JSON.stringify(existing));
       } catch (err) {
-        setDisplayedCode(`// Error: ${err.message}`);
+        if (cancelled || err.name === 'AbortError') return;
+        setError(err.message);
+        setDisplayedCode('');
         setIsGenerating(false);
+        setIsStreaming(false);
       }
     }
-    fetchGeneration();
+
+    run();
+    return () => {
+      cancelled = true;
+      controller.abort();
+      if (codeTimer) clearTimeout(codeTimer);
+      if (previewTimer) clearTimeout(previewTimer);
+    };
   }, [prompt, model]);
 
-  // Typewriter effect for code panel
   useEffect(() => {
-    if (!fullCode || !isTyping) return;
-    let i = 0;
-    const charsPerTick = 40;
-    const interval = setInterval(() => {
-      i += charsPerTick;
-      setDisplayedCode(fullCode.slice(0, i));
-      if (i >= fullCode.length) {
-        clearInterval(interval);
-        setIsTyping(false);
-      }
-    }, 15);
-    return () => clearInterval(interval);
-  }, [fullCode, isTyping]);
-
-  // Auto-scroll code container as code types
-  useEffect(() => {
-    if (isTyping && codeContainerRef.current) {
+    if ((isGenerating || isStreaming) && codeContainerRef.current) {
       codeContainerRef.current.scrollTop = codeContainerRef.current.scrollHeight;
     }
-  }, [displayedCode, isTyping]);
+  }, [displayedCode, isGenerating, isStreaming]);
 
-  // Syntax highlighting via Prism
   const highlightedCode = useMemo(() => {
     if (!displayedCode) return '';
     try {
@@ -95,7 +162,6 @@ export default function Workspace() {
     }
   }, [displayedCode]);
 
-  // Prevent navbar links from navigating the iframe to the parent app
   const previewHtml = useMemo(() => {
     if (!fullCode) return '';
     const clickGuard = `
@@ -123,20 +189,44 @@ document.addEventListener('click', function(e) {
       : fullCode + clickGuard;
   }, [fullCode]);
 
-  const handleSkipTyping = () => {
-    if (fullCode) {
-      setDisplayedCode(fullCode);
-      setIsTyping(false);
-    }
-  };
-
   return (
     <div className="relative flex w-full h-screen bg-black text-white overflow-hidden p-6 gap-6">
       <div className="absolute inset-0 z-0">
         <SpiderCursor />
       </div>
 
-      {/* LEFT: Live Render Preview */}
+      <button
+        type="button"
+        aria-label="Home"
+        title="Home"
+        onClick={() => navigate('/')}
+        className="absolute top-8 left-8 z-30 flex items-center justify-center cursor-pointer"
+        style={{
+          width: '2.5rem',
+          height: '2.5rem',
+          borderRadius: '12px',
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          color: 'rgba(255, 255, 255, 0.7)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+          transition: 'all 0.2s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+          e.currentTarget.style.color = '#fff';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+          e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+        }}
+      >
+        <Home size={18} />
+      </button>
+
       <div
         className="relative z-10 w-1/2 h-full flex items-center justify-center overflow-hidden"
         style={{
@@ -148,7 +238,7 @@ document.addEventListener('click', function(e) {
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
         }}
       >
-        {!isTyping && fullCode ? (
+        {fullCode ? (
           <iframe
             title="preview"
             srcDoc={previewHtml}
@@ -157,12 +247,15 @@ document.addEventListener('click', function(e) {
           />
         ) : (
           <p className="text-white/40 font-mono text-sm">
-            {isGenerating || isTyping ? `Building your page${dots}` : 'Output will render here...'}
+            {isGenerating || isStreaming
+              ? `Building your page${dots}`
+              : error
+                ? `Error: ${error}`
+                : 'Output will render here...'}
           </p>
         )}
       </div>
 
-      {/* RIGHT: Code Editor with Syntax Highlighting */}
       <div
         className="relative z-10 w-1/2 h-full p-6 flex flex-col overflow-hidden"
         style={{
@@ -178,14 +271,6 @@ document.addEventListener('click', function(e) {
           <p className="font-mono text-sm text-white/60 truncate max-w-[80%] m-0">
             Prompt: {prompt}
           </p>
-          {isTyping && (
-            <button
-              onClick={handleSkipTyping}
-              className="font-mono text-xs text-white/50 hover:text-white bg-white/10 px-2 py-1 rounded cursor-pointer transition-colors"
-            >
-              Skip ⚡
-            </button>
-          )}
         </div>
 
         {usedProvider && (
@@ -200,7 +285,10 @@ document.addEventListener('click', function(e) {
           </p>
         )}
 
-        {/* Syntax Highlighted Code Area */}
+        {error && (
+          <p className="font-mono text-xs text-red-400 mb-2 shrink-0 m-0">{error}</p>
+        )}
+
         <pre
           ref={codeContainerRef}
           className="font-mono text-xs overflow-y-auto flex-1 whitespace-pre-wrap leading-relaxed select-text"
@@ -216,7 +304,9 @@ document.addEventListener('click', function(e) {
             className="language-html"
             dangerouslySetInnerHTML={{ __html: highlightedCode }}
           />
-          {isTyping && <span className="animate-pulse text-blue-400">▊</span>}
+          {(isGenerating || isStreaming) && (
+            <span className="animate-pulse text-blue-400">▊</span>
+          )}
         </pre>
 
         <div className="mt-4 shrink-0">

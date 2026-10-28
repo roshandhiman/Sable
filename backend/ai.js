@@ -11,21 +11,20 @@ OUTPUT FORMAT:
 Return ONLY a single complete, self-contained HTML file with all CSS inside <style> and all JavaScript inside <script>.
 Start directly with <!DOCTYPE html>. No markdown code blocks, no explanations, no text outside the HTML.
 
-DESIGN PHILOSOPHY & RULES (STRICT):
-1. AESTHETICS — ULTRA-CLEAN MODERN MINIMALISM:
-   - Background: Deep obsidian/zinc (#09090b or #0b0f17).
-   - Glassmorphism & Cards: Dark card surfaces (#11131a, #181924, or rgba(255,255,255,0.03)) with razor-thin borders (1px solid rgba(255,255,255,0.08) or rgba(255,255,255,0.12) on hover).
-   - NO TACKY GRADIENTS: No rainbow or harsh neon gradients. Use sleek monochromatic styling with subtle, tasteful accents (cool indigo #6366f1, cyan #38bdf8, emerald #10b981, or pure crisp white #ffffff with subtle shadows).
+DESIGN PHILOSOPHY & RULES:
+1. ART DIRECTION — DISTINCTIVE, BRIEF-LED DESIGN:
+   - Treat each prompt as a real creative brief. Identify the audience, product, mood, and primary action, then design specifically for them. Do not force every website into the same template.
+   - Honor an explicitly requested style first, including neo-brutalism, editorial, Swiss, Y2K, luxury, playful, minimal, or dark tech. When no style is specified, use a polished contemporary editorial direction with confident typography, purposeful asymmetry, tactile details, and one memorable visual idea.
+   - Make neo-brutalism intentional when it fits: strong ink-like borders, hard offset shadows, oversized type, visible grid structure, punchy but controlled color, and tactile hover states. Avoid piling every brutalist trope into one page.
+   - Build a coherent palette for the brand and subject. Use a dominant background, strong text contrast, one primary accent, and at most one supporting accent. Acid lime, cobalt, vermilion, or warm paper are options, not defaults. Never use generic purple-blue AI gradients, gratuitous glow, glass cards, or neon decoration.
+   - Use real visual hierarchy and deliberate whitespace. Vary section composition, scale, alignment, and rhythm. Use grids, editorial columns, oversized numerals, image crops, graphic shapes, or restrained texture only when they strengthen the idea.
+   - Every section should have a clear purpose and visual variation. Avoid repeated rounded-card grids, identical feature tiles, generic dashboards, stock SaaS copy, filler sections, and decorative elements with no role.
 
-2. TYPOGRAPHY (CRITICAL):
-   - Always load modern fonts via Google Fonts in <head>:
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-   - Base font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif.
-   - Headings: tight letter-spacing (-0.03em to -0.04em), lineHeight: 1.15, crisp weight (700 or 800).
-   - Body: #94a3b8 or #a1a1aa, lineHeight: 1.6, letter-spacing: -0.01em.
-   - Micro-labels/Badges: font-size 11-13px, font-weight 600, uppercase letter-spacing 0.08em.
+2. TYPOGRAPHY AND DETAIL:
+   - Choose typography that fits the brief. Load suitable Google Fonts in <head> when appropriate, with sensible system fallbacks. Do not force the same font pair onto every brand.
+   - Use a clearly differentiated display face and readable body face. Make the headline memorable through scale, line breaks, weight, or composition rather than excessive effects.
+   - Keep body copy readable with comfortable line-height and measure. Use small uppercase labels sparingly for metadata, not as the default for all text.
+   - Make buttons, navigation, inputs, focus states, hover states, dividers, borders, and shadows feel like one deliberate design system. Avoid default pill buttons unless they suit the brand.
 
 3. NEVER OUTPUT BROKEN IMAGES (ZERO TOLERANCE):
    - NEVER use placeholder text in <img> src.
@@ -38,25 +37,20 @@ DESIGN PHILOSOPHY & RULES (STRICT):
      * Food / Restaurant: https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80
    - When in doubt, prefer beautiful inline SVG icons, Bento metric stat cards, and interactive UI widgets instead of images.
 
-4. PAGE ARCHITECTURE (MUST INCLUDE):
-   - Floating Navbar: Sticky/fixed top navigation with logo, nav links (with hover state), and pill CTA button. Backdrop-blur: 16px.
-   - Hero Section:
-     * Pill badge (e.g., <div class="badge"><span>✦</span> Next-Gen Platform</div>).
-     * High-impact headline with tight tracking.
-     * Compelling subheadline.
-     * Dual CTA buttons (Primary solid white/accent button + Secondary glass/ghost button).
-   - Social Proof / Metrics Bar: 3-4 impressive live metrics (e.g., "99.9% Uptime", "50k+ Active Users", "4.9/5 Rating").
-   - Interactive Bento Grid or Features Section:
-     * Clean cards with subtle border highlight on hover.
-     * At least ONE interactive component with WORKING JavaScript: e.g., interactive tab switcher, interactive pricing toggle (Monthly vs Annual), interactive calculator, or live filter.
-   - Minimalist Footer: columns with links, copyright, and subtle live status dot (green dot + "All systems operational").
+4. PAGE STRUCTURE AND FUNCTION:
+   - Choose page sections based on the actual request and product. Do not add pricing, testimonials, metrics, feature grids, badges, or a multi-column footer unless they make sense for that brief.
+   - Make the first viewport immediately communicate what the site is, who it serves, and what to do next. Use a distinct, high-impact hero composition, not a mandatory badge-plus-headline-plus-two-buttons formula.
+   - Give each page a logical reading flow, intentional section transitions, and a clear primary action. Make the navigation useful for the sections that actually exist.
+   - Include functional interactions when the concept calls for them: working navigation, forms with clear validation/feedback, tabs, filters, accordions, calculators, or toggles. Do not add fake controls or interactions just to satisfy a checklist. Use vanilla JavaScript and ensure interactions work without external frameworks.
+   - Use truthful, prompt-provided content. Never invent customer counts, ratings, testimonials, certifications, addresses, or performance claims. When the user has not supplied specifics, use concise non-factual copy rather than fabricated proof.
+   - Use suitable, working image URLs only when imagery improves the result. Prefer the verified Unsplash URLs below or create visual interest with CSS and inline SVG. Always set useful alt text and sensible image sizing.
 
-5. CSS RESET & FLUID RESPONSIVENESS:
-   - Always include:
-     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-     html { scroll-behavior: smooth; background: #09090b; color: #f4f4f5; }
-     body { min-height: 100vh; overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
-   - Buttons: cursor: pointer, border-radius: 9999px or 12px, smooth transitions: all 0.2s cubic-bezier(0.16, 1, 0.3, 1).
+5. RESPONSIVE, ACCESSIBLE, PRODUCTION-QUALITY HTML:
+   - Include a small CSS reset, semantic landmarks, a useful page title, viewport metadata, and a responsive layout that works from narrow mobile screens through wide desktop.
+   - Use fluid type and spacing with clamp() where useful. Prevent horizontal overflow. Reflow navigation, grids, and hero composition cleanly on mobile.
+   - Maintain strong text contrast, visible keyboard focus, descriptive accessible labels, correct button/link semantics, and reduced-motion support for animations.
+   - Keep the output self-contained: inline CSS and vanilla JavaScript only. No React, build steps, external component libraries, fake controls, or dependencies beyond suitable font/image URLs.
+   - Ensure every visible link and control has a sensible, working action. Validate forms client-side and provide visible success/error feedback where relevant.
 
 6. STRICT NO-COMMENT RULE (MANDATORY):
    - NEVER write comments in the code.
@@ -102,6 +96,47 @@ async function openaiCall(url, key, model, messages) {
   return data.choices[0].message.content
 }
 
+async function* sseDeltas(res, extract) {
+  const reader = res.body.getReader()
+  const decoder = new TextDecoder()
+  let buf = ''
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    buf += decoder.decode(value, { stream: true })
+    const lines = buf.split(/\r?\n/)
+    buf = lines.pop()
+    for (const line of lines) {
+      const t = line.trim()
+      if (!t.startsWith('data:')) continue
+      const payload = t.slice(5).trim()
+      if (!payload || payload === '[DONE]') continue
+      let json
+      try { json = JSON.parse(payload) } catch { continue }
+      const text = extract(json)
+      if (text) yield text
+    }
+  }
+}
+
+async function* openaiStream(url, key, model, messages, signal) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${key}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ model, messages, max_tokens: 8192, stream: true }),
+    signal
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    console.error(`[${model} stream] ${res.status}:`, err?.error?.message || err?.message || '')
+    throw new Error(`${res.status}`)
+  }
+  yield* sseDeltas(res, j => j?.choices?.[0]?.delta?.content || j?.choices?.[0]?.text || '')
+}
+
 async function geminiCall(messages) {
   const text = messages.map(m => `${m.role}: ${m.content}`).join('\n')
   const models = ['gemini-2.5-flash', 'gemini-3.6-flash']
@@ -132,69 +167,87 @@ async function geminiCall(messages) {
   throw new Error('Gemini generation failed')
 }
 
-// Backward compatibility alias map
+async function* geminiStream(messages, signal) {
+  const text = messages.map(m => `${m.role}: ${m.content}`).join('\n')
+  const models = ['gemini-2.5-flash', 'gemini-3.6-flash']
+  let emitted = false
+
+  for (const model of models) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${process.env.GEMINI_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text }] }] }),
+          signal
+        }
+      )
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        console.error(`[gemini stream] ${model} ${res.status}:`, JSON.stringify(err))
+        continue
+      }
+      for await (const delta of sseDeltas(res, j => j?.candidates?.[0]?.content?.parts?.[0]?.text || '')) {
+        emitted = true
+        yield delta
+      }
+      if (emitted) return
+    } catch (e) {
+      if (e.name === 'AbortError') throw e
+      console.error(`[gemini stream] ${model} error:`, e.message)
+    }
+  }
+
+  if (!emitted) throw new Error('Gemini generation failed')
+}
 const legacyAliasMap = {
   'nvidia-llama': 'openrouter-llama',
   'mistral-small': 'mistral-codestral',
   'mistral-large': 'mistral-7b'
 }
 
+const openaiProvider = (id, label, url, keyEnv, model) => ({
+  id,
+  label,
+  fn: (m) => openaiCall(url, process.env[keyEnv], model, m),
+  stream: (m, s) => openaiStream(url, process.env[keyEnv], model, m, s)
+})
+
 const providers = [
-  {
-    id: 'groq-gpt120b',
-    label: 'GPT-OSS 120B (Groq)',
-    fn: (m) => openaiCall('https://api.groq.com/openai/v1/chat/completions', process.env.GROQ_KEY, 'openai/gpt-oss-120b', m)
-  },
-  {
-    id: 'groq-gpt20b',
-    label: 'GPT-OSS 20B (Groq)',
-    fn: (m) => openaiCall('https://api.groq.com/openai/v1/chat/completions', process.env.GROQ_KEY, 'openai/gpt-oss-20b', m)
-  },
-  {
-    id: 'groq-qwen',
-    label: 'Qwen 3 27B (Groq)',
-    fn: (m) => openaiCall('https://api.groq.com/openai/v1/chat/completions', process.env.GROQ_KEY, 'qwen/qwen3.8-27b', m)
-  },
-  {
-    id: 'mistral-codestral',
-    label: 'Codestral (Mistral)',
-    fn: (m) => openaiCall('https://api.mistral.ai/v1/chat/completions', process.env.MISTRAL_KEY, 'codestral-latest', m)
-  },
-  {
-    id: 'mistral-7b',
-    label: 'Mistral 7B (Mistral)',
-    fn: (m) => openaiCall('https://api.mistral.ai/v1/chat/completions', process.env.MISTRAL_KEY, 'open-mistral-7b', m)
-  },
+  openaiProvider('groq-gpt120b', 'GPT-OSS 120B (Groq)', 'https://api.groq.com/openai/v1/chat/completions', 'GROQ_KEY', 'openai/gpt-oss-120b'),
+  openaiProvider('groq-gpt20b', 'GPT-OSS 20B (Groq)', 'https://api.groq.com/openai/v1/chat/completions', 'GROQ_KEY', 'openai/gpt-oss-20b'),
+  openaiProvider('groq-qwen', 'Qwen 3 27B (Groq)', 'https://api.groq.com/openai/v1/chat/completions', 'GROQ_KEY', 'qwen/qwen3.8-27b'),
+  openaiProvider('mistral-codestral', 'Codestral (Mistral)', 'https://api.mistral.ai/v1/chat/completions', 'MISTRAL_KEY', 'codestral-latest'),
+  openaiProvider('mistral-7b', 'Mistral 7B (Mistral)', 'https://api.mistral.ai/v1/chat/completions', 'MISTRAL_KEY', 'open-mistral-7b'),
   {
     id: 'gemini-flash',
     label: 'Gemini Flash (Google)',
-    fn: (m) => geminiCall(m)
+    fn: (m) => geminiCall(m),
+    stream: (m, s) => geminiStream(m, s)
   },
-  {
-    id: 'openrouter-deepseek',
-    label: 'DeepSeek V3 (OpenRouter)',
-    fn: (m) => openaiCall('https://openrouter.ai/api/v1/chat/completions', process.env.OPENROUTER_KEY, 'deepseek/deepseek-chat-v3-0324', m)
-  },
-  {
-    id: 'openrouter-llama',
-    label: 'Llama 3.3 70B (OpenRouter)',
-    fn: (m) => openaiCall('https://openrouter.ai/api/v1/chat/completions', process.env.OPENROUTER_KEY, 'meta-llama/llama-3.3-70b-instruct', m)
-  }
+  openaiProvider('openrouter-deepseek', 'DeepSeek V3 (OpenRouter)', 'https://openrouter.ai/api/v1/chat/completions', 'OPENROUTER_KEY', 'deepseek/deepseek-chat-v3-0324'),
+  openaiProvider('openrouter-llama', 'Llama 3.3 70B (OpenRouter)', 'https://openrouter.ai/api/v1/chat/completions', 'OPENROUTER_KEY', 'meta-llama/llama-3.3-70b-instruct')
 ]
 
-export async function generate(selectedId, history, prompt) {
-  const targetId = legacyAliasMap[selectedId] || selectedId
-  const messages = [
+function buildMessages(history, prompt) {
+  return [
     { role: 'system', content: SYSTEM },
-    ...history,
+    ...(history || []),
     { role: 'user', content: prompt }
   ]
+}
 
+function providerOrder(selectedId) {
+  const targetId = legacyAliasMap[selectedId] || selectedId
   const startIndex = providers.findIndex(p => p.id === targetId)
-  const order = [
-    ...providers.slice(startIndex === -1 ? 0 : startIndex),
-    ...providers.slice(0, startIndex === -1 ? 0 : startIndex)
-  ]
+  const start = startIndex === -1 ? 0 : startIndex
+  return [...providers.slice(start), ...providers.slice(0, start)]
+}
+
+export async function generate(selectedId, history, prompt) {
+  const messages = buildMessages(history, prompt)
+  const order = providerOrder(selectedId)
 
   for (const provider of order) {
     console.log(`Trying: ${provider.label}`)
@@ -205,6 +258,44 @@ export async function generate(selectedId, history, prompt) {
       return { html, usedProvider: provider.label }
     } catch (e) {
       console.log(`Failed: ${provider.label} — ${e.message}`)
+      continue
+    }
+  }
+
+  throw new Error('All providers failed')
+}
+
+export async function* generateStream(selectedId, history, prompt, signal) {
+  const messages = buildMessages(history, prompt)
+  const order = providerOrder(selectedId)
+  let started = false
+
+  for (const provider of order) {
+    if (!provider.stream) continue
+    let iterator
+    try {
+      iterator = provider.stream(messages, signal)
+      const first = await iterator.next()
+      if (first.done || !first.value) {
+        await iterator.return?.()?.catch?.(() => {})
+        continue
+      }
+      started = true
+      console.log(`Streaming from: ${provider.label}`)
+      yield { type: 'meta', provider: provider.label }
+      yield { type: 'delta', text: first.value }
+      for await (const chunk of iterator) {
+        if (chunk) yield { type: 'delta', text: chunk }
+      }
+      yield { type: 'done', provider: provider.label }
+      return
+    } catch (e) {
+      if (e.name === 'AbortError') throw e
+      if (started) {
+        yield { type: 'error', message: e.message }
+        return
+      }
+      console.log(`Stream failed: ${provider.label} — ${e.message}`)
       continue
     }
   }

@@ -7,7 +7,7 @@ dotenv.config({ path: path.join(__dirname, '.env') })
 
 import express from 'express'
 import cors from 'cors'
-import { generate, modelList } from './ai.js'
+import { generate, generateStream, modelList } from './ai.js'
 
 const app = express()
 app.use(cors())
@@ -27,12 +27,44 @@ const handleGenerate = async (req, res) => {
   }
 }
 
-// Support both routes with and without /api prefix (for local and Vercel serverless rewrites)
+const handleGenerateStream = async (req, res) => {
+  const { model, history, prompt } = req.body
+  const controller = new AbortController()
+  res.on('close', () => controller.abort())
+
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no'
+  })
+
+  const send = (payload) => {
+    if (!res.writableEnded) res.write(`data: ${JSON.stringify(payload)}\n\n`)
+  }
+
+  try {
+    for await (const event of generateStream(model, history || [], prompt, controller.signal)) {
+      send(event)
+    }
+  } catch (err) {
+    if (err.name !== 'AbortError') send({ type: 'error', message: err.message })
+  } finally {
+    if (!res.writableEnded) {
+      res.write('data: [DONE]\n\n')
+      res.end()
+    }
+  }
+}
+
 app.get('/models', handleModels)
 app.get('/api/models', handleModels)
 
 app.post('/generate', handleGenerate)
 app.post('/api/generate', handleGenerate)
+
+app.post('/generate/stream', handleGenerateStream)
+app.post('/api/generate/stream', handleGenerateStream)
 
 const port = process.env.PORT || 3001
 app.listen(port, () => {
