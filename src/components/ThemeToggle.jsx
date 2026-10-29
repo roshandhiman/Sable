@@ -1,6 +1,7 @@
 import React from 'react';
 
 export default function ThemeToggle({ isDarkMode, onToggle }) {
+  const fg = isDarkMode ? '#fff' : '#0f172a';
   return (
     <button
       onClick={onToggle}
@@ -15,16 +16,16 @@ export default function ThemeToggle({ isDarkMode, onToggle }) {
         width: '2.75rem',
         height: '2.75rem',
         borderRadius: '50%',
-        border: '1px solid rgba(255,255,255,0.2)',
+        border: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(15,23,42,0.25)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        background: 'rgba(255,255,255,0.05)',
+        background: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.04)',
         cursor: 'pointer',
-        color: '#fff',
+        color: fg,
         transition: 'background 0.2s',
       }}
-      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
-      onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+      onMouseEnter={e => (e.currentTarget.style.background = isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.1)')}
+      onMouseLeave={e => (e.currentTarget.style.background = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.04)')}
       aria-label="Toggle theme"
     >
       {isDarkMode ? (

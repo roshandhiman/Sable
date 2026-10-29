@@ -36,6 +36,45 @@ export default function ConstellationGrid() {
     setAuthUser(null);
   };
   useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent =
+      '@keyframes theme-ripple-expand { from { transform: scale(0); } to { transform: scale(1); } } @keyframes theme-ripple-fade { from { opacity: 1; } to { opacity: 0; } }';
+    document.head.appendChild(style);
+    return () => style.remove();
+  }, []);
+  const spawnThemeRipple = (x: number, y: number, nextDark: boolean) => {
+    const radius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y),
+    );
+    const ripple = document.createElement('div');
+    ripple.style.position = 'fixed';
+    ripple.style.left = `${x - radius}px`;
+    ripple.style.top = `${y - radius}px`;
+    ripple.style.width = `${radius * 2}px`;
+    ripple.style.height = `${radius * 2}px`;
+    ripple.style.borderRadius = '50%';
+    ripple.style.background = nextDark ? '#030407' : '#fdfdfd';
+    ripple.style.pointerEvents = 'none';
+    ripple.style.zIndex = '9999';
+    ripple.style.transform = 'scale(0)';
+    ripple.style.animation =
+      'theme-ripple-expand 0.9s ease forwards, theme-ripple-fade 0.45s ease-in 0.85s forwards';
+    document.body.appendChild(ripple);
+    ripple.addEventListener('animationend', (event) => {
+      if (event.animationName === 'theme-ripple-fade') ripple.remove();
+    });
+  };
+  const handleThemeToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    setUserOverride(true);
+    const next = !isDarkMode;
+    setIsDarkMode(next);
+    spawnThemeRipple(x, y, next);
+  };
+  useEffect(() => {
     if (userOverride) return;
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     setIsDarkMode(mq.matches);
@@ -202,7 +241,7 @@ export default function ConstellationGrid() {
       {/* COMPONENTS corner link */}
       <button
         onClick={() => navigate('/components')}
-        style={{ position: 'absolute', bottom: '1.5rem', left: '1.5rem', zIndex: 50, background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff', fontFamily: 'ui-monospace, monospace', fontSize: '0.7rem', letterSpacing: '0.15em', opacity: 0.6, textTransform: 'uppercase', padding: 0 }}
+        style={{ position: 'absolute', bottom: '1.5rem', left: '1.5rem', zIndex: 50, background: 'transparent', border: 'none', cursor: 'pointer', color: isDarkMode ? '#fff' : '#0f172a', fontFamily: 'ui-monospace, monospace', fontSize: '0.7rem', letterSpacing: '0.15em', opacity: 0.6, textTransform: 'uppercase', padding: 0 }}
         onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
         onMouseLeave={e => (e.currentTarget.style.opacity = '0.6')}
       >
@@ -211,7 +250,7 @@ export default function ConstellationGrid() {
 
       <button
         onClick={() => navigate('/works')}
-        style={{ position: 'absolute', bottom: '1.5rem', left: '9rem', zIndex: 50, background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff', fontFamily: 'ui-monospace, monospace', fontSize: '0.7rem', letterSpacing: '0.15em', opacity: 0.6, textTransform: 'uppercase', padding: 0 }}
+        style={{ position: 'absolute', bottom: '1.5rem', left: '9rem', zIndex: 50, background: 'transparent', border: 'none', cursor: 'pointer', color: isDarkMode ? '#fff' : '#0f172a', fontFamily: 'ui-monospace, monospace', fontSize: '0.7rem', letterSpacing: '0.15em', opacity: 0.6, textTransform: 'uppercase', padding: 0 }}
         onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
         onMouseLeave={e => (e.currentTarget.style.opacity = '0.6')}
       >
@@ -220,7 +259,7 @@ export default function ConstellationGrid() {
 
       <button
         onClick={() => navigate('/github')}
-        style={{ position: 'absolute', bottom: '1.5rem', left: '16.5rem', zIndex: 50, background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff', fontFamily: 'ui-monospace, monospace', fontSize: '0.7rem', letterSpacing: '0.15em', opacity: 0.6, textTransform: 'uppercase', padding: 0 }}
+        style={{ position: 'absolute', bottom: '1.5rem', left: '16.5rem', zIndex: 50, background: 'transparent', border: 'none', cursor: 'pointer', color: isDarkMode ? '#fff' : '#0f172a', fontFamily: 'ui-monospace, monospace', fontSize: '0.7rem', letterSpacing: '0.15em', opacity: 0.6, textTransform: 'uppercase', padding: 0 }}
         onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
         onMouseLeave={e => (e.currentTarget.style.opacity = '0.6')}
       >
@@ -229,7 +268,7 @@ export default function ConstellationGrid() {
 
       {authUser && (
         <div
-          style={{ position: 'absolute', top: '2rem', right: '9rem', zIndex: 20, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem', letterSpacing: '0.08em', color: '#fff', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '999px', padding: '0.45rem 0.9rem', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', whiteSpace: 'nowrap', maxWidth: '12rem', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          style={{ position: 'absolute', top: '2rem', right: '9rem', zIndex: 20, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem', letterSpacing: '0.08em', color: isDarkMode ? '#fff' : '#0f172a', background: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.04)', border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(15,23,42,0.2)', borderRadius: '999px', padding: '0.45rem 0.9rem', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', whiteSpace: 'nowrap', maxWidth: '12rem', overflow: 'hidden', textOverflow: 'ellipsis' }}
         >
           {authUser}
         </div>
@@ -237,17 +276,17 @@ export default function ConstellationGrid() {
 
       <button
         onClick={authUser ? handleLogout : () => setIsAuthOpen(true)}
-        style={{ position: 'absolute', top: '1.5rem', right: '5.5rem', zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '2.75rem', height: '2.75rem', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', background: 'rgba(255,255,255,0.05)', cursor: 'pointer', transition: 'background 0.2s' }}
+        style={{ position: 'absolute', top: '1.5rem', right: '5.5rem', zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '2.75rem', height: '2.75rem', borderRadius: '50%', border: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(15,23,42,0.25)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', background: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.04)', cursor: 'pointer', transition: 'background 0.2s' }}
         aria-label={authUser ? 'Logout' : 'Account'}
-        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
-        onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+        onMouseEnter={e => (e.currentTarget.style.background = isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.1)')}
+        onMouseLeave={e => (e.currentTarget.style.background = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.04)')}
       >
         {authUser ? (
-          <svg xmlns="http://www.w3.org/2000/svg" style={{ width: '1.25rem', height: '1.25rem', color: '#fff' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg xmlns="http://www.w3.org/2000/svg" style={{ width: '1.25rem', height: '1.25rem', color: isDarkMode ? '#fff' : '#0f172a' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" style={{ width: '1.25rem', height: '1.25rem', color: '#fff' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg xmlns="http://www.w3.org/2000/svg" style={{ width: '1.25rem', height: '1.25rem', color: isDarkMode ? '#fff' : '#0f172a' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         )}
@@ -255,10 +294,7 @@ export default function ConstellationGrid() {
 
       <ThemeToggle
         isDarkMode={isDarkMode}
-        onToggle={() => {
-          setUserOverride(true);
-          setIsDarkMode((prev) => !prev);
-        }}
+        onToggle={handleThemeToggle}
       />
 
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
